@@ -1,0 +1,53 @@
+(1) CMakeLists.txt
+
+set(TARGET_NAME glsl3d_view_matrix)
+
+set(LIB_DEPENDENCY fslazywindow ysclass ysgl ysglcpp ysglcpp_gl2)
+
+
+
+(2) main.cpp
+
+#include <ysclass.h>
+#include <ysgl.h>
+#include <ysglcpp.h>
+#include <ysglslcpp.h>
+
+
+/* virtual */ void FsLazyWindowApplication::Initialize(int argc,char *argv[])
+{
+	YsGLSLRenderer::CreateSharedRenderer();
+}
+/* virtual */ void FsLazyWindowApplication::BeforeTerminate(void)
+{
+	YsGLSLRenderer::DeleteSharedRenderer();
+}
+
+
+(3) FsLazyWindowApplication member variables and initialization:
+	double h,p,b;
+	YsVec3 viewTarget;
+	double viewDist;
+
+FsLazyWindowApplication::FsLazyWindowApplication()
+{
+	h=YsPi/4.0;
+	p=YsPi/5.0;
+	b=0;
+	viewTarget.Set(0.0,0.0,0.0);
+	viewDist=20.0;
+
+	needRedraw=false;
+}
+
+
+(4) Draw function
+	DrawPlainCube
+	Draw
+
+
+(5) Interval
+	double t=(double)FsSubSecondTimer()/1000.0;
+	h=YsPi*t;
+	p=sin(YsPi*t)*YsPi/4.0;
+

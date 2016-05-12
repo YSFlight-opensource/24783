@@ -1,0 +1,16 @@
+From view_matrix
+
+(1) CMakeLists.txt
+
+set(TARGET_NAME glsl3d_lighting)
+
+
+(2) Draw function
+	void DrawPlainCube(YsGLSLShaded3DRenderer &renderer,double d) const;
+
+
+	DrawPlainCube
+	Draw
+		renderer.SetLightDirectionInCameraCoordinate(0,lightDir);
+
+
