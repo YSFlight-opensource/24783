@@ -1,8 +1,0 @@
-from plain3d
-
-() svn-copy plain3d_fragment_shader.glsl, plain3d_vertex_shader.glsl -> rainbow3d_fragment_shader.glsl, rainbow3d_vertex_shader.glsl
-
-() Write shaders.
-
-() Add Rainbow3dRenderer
-
