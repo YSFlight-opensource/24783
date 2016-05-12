@@ -1,0 +1,51 @@
+From binary_stl
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_mouse_to_line)
+
+
+
+() Add
+    YsVec3 lastClick[2];
+   and initialize in the constructor.
+
+    lastClick[0]=YsVec3::Origin();
+    lastClick[1]=YsVec3::Origin();
+
+
+
+() In Interval
+    if(evt==FSMOUSEEVENT_LBUTTONDOWN)
+    {
+        double x=(double)mx/(double)wid;
+        double y=(double)(hei-my)/(double)hei;
+        x=x*2.0-1.0;
+        y=y*2.0-1.0;
+
+        lastClick[0].Set(x,y,-1.0);
+        lastClick[1].Set(x,y, 1.0);
+        for(auto &p : lastClick)
+        {
+            drawEnv.GetProjectionMatrix().MulInverse(p,p,1.0);
+            drawEnv.GetViewMatrix().MulInverse(p,p,1.0);
+        }
+    }
+
+
+
+() In Draw 
+    {
+        YsGLSLPlain3DRenderer renderer;  // Again, do not nest the renderer!
+        renderer.SetProjection(projMat);
+        renderer.SetModelView(viewMat);
+
+        GLfloat color[8]={0,0,1,1, 1,0,0,1};
+        const GLfloat vtx[6]=
+        {
+            lastClick[0].xf(),lastClick[0].yf(),lastClick[0].zf(),
+            lastClick[1].xf(),lastClick[1].yf(),lastClick[1].zf()
+        };
+        renderer.DrawVtxCol(GL_LINES,2,vtx,color);
+    }
+

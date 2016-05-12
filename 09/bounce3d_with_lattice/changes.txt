@@ -1,0 +1,61 @@
+From vbo
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_bounce3d_with_lattice)
+
+
+
+() Change
+    NUM_BALL=10000
+
+    viewDist=80.0;
+
+   Initial locations:
+        int x=rand()%51-25;
+        int y=25+rand()%51-25;
+        int z=rand()%51-25;
+
+   Walls:
+        b.BounceOnWall(YsVec3( 60.0,0.0,0.0),YsVec3(-1.0,0.0,0.0));
+        b.BounceOnWall(YsVec3(-60.0,0.0,0.0),YsVec3( 1.0,0.0,0.0));
+        b.BounceOnWall(YsVec3(0.0, 60.0,0.0),YsVec3(0.0,-1.0,0.0));
+        b.BounceOnWall(YsVec3(0.0,-60.0,0.0),YsVec3(0.0, 1.0,0.0));
+        b.BounceOnWall(YsVec3(0.0,0.0, 60.0),YsVec3(0.0,0.0,-1.0));
+        b.BounceOnWall(YsVec3(0.0,0.0,-60.0),YsVec3(0.0,0.0, 1.0));
+
+   Shadow matrix:
+        YsMatrix4x4 shadowMat;
+        shadowMat.Translate(0,-60.0,0);
+        shadowMat.Scale(1.0,0.0,1.0);
+
+
+
+() Add lattice.h
+
+
+
+() 
+#include "lattice.h"
+
+Member variables:
+    Lattice3d <std::vector <Ball *> > ltc;
+
+In Initialize
+    ltc.Create(40,40,40);
+    ltc.SetDimension(YsVec3(-61.0,-61.0,-61.0),YsVec3(61.0,61.0,61.0));
+
+
+
+()
+    double Ball::GetRadius(void) const
+    {
+        return 1.0;
+    }
+
+
+
+() Add RegisterBall
+
+
+() Modify BallCollision

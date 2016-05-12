@@ -1,0 +1,48 @@
+From simple_shadow
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_vbo)
+
+
+() Create vertex_buffer_object.h
+
+
+
+() Add vertex_buffer_object.h in CMakeLists.txt
+
+
+() include vertex_buffer_object.h
+
+
+() Add member variable (remove cubeVtx)
+    VertexBufferObjectVtxNomCol cubeVbo;
+
+
+() In MakeCube function,
+    cubeVbo.CreateBuffer(sizeof(vtxNomCol));
+    auto currentPtr=cubeVbo.GetZeroPointer();
+    cubeVbo.vtxPtr=cubeVbo.PushBufferSubData(currentPtr,108,vtxNomCol);
+    cubeVbo.nomPtr=cubeVbo.PushBufferSubData(currentPtr,108,vtxNomCol+108);
+    cubeVbo.colPtr=cubeVbo.PushBufferSubData(currentPtr,144,vtxNomCol+216);
+
+    (Delete loop for cubeVtx)
+
+
+
+
+() DrawPlainCube
+void FsLazyWindowApplication::DrawPlainCube(YsGLSLShaded3DRenderer &renderer) const
+{
+    glBindBuffer(GL_ARRAY_BUFFER,cubeVbo.GetVboIdent());
+    renderer.DrawVtxNomCol(GL_TRIANGLES,36,(GLfloat *)cubeVbo.vtxPtr,(GLfloat *)cubeVbo.nomPtr,(GLfloat *)cubeVbo.colPtr);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+}
+void FsLazyWindowApplication::DrawPlainCube(YsGLSLPlain3DRenderer &renderer) const
+{
+    glBindBuffer(GL_ARRAY_BUFFER,cubeVbo.GetVboIdent());
+    renderer.DrawVtx(GL_TRIANGLES,36,(GLfloat *)cubeVbo.vtxPtr);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+}
+
+

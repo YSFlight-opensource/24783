@@ -1,0 +1,97 @@
+From ysviewcontrol
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_binary_stl)
+
+
+
+() Copy vertex_buffer_object.h and add to CMakeLists.txt
+
+
+
+() Add member variables:
+	std::vector <float> vtx,nom;
+	YsVec3 min,max;
+
+
+
+()
+	static bool CPUisLittleEndian(void);
+	static int BinaryToInt(const unsigned char dw[4]);
+	static float BinaryToFloat(const unsigned char dw[4]);
+	static void LoadBinaryStl(std::vector <float> &vtx,std::vector <float> &nom,const char fn[]);
+	void LoadBinaryStl(const char fn[]);
+
+
+()
+/* virtual */ void FsLazyWindowApplication::BeforeEverything(int argc,char *argv[])
+{
+	if(2<=argc)
+	{
+		LoadBinaryStl(argv[1]);
+	}
+}
+
+
+
+() Add and call from LoadBinaryStl
+void FsLazyWindowApplication::CacheBoundingBox(void)
+
+
+
+() Delete 
+	YsAtt3 cubeAtt;
+	YsVec3 cubePos;
+
+
+    std::vector <GLfloat> cubeVtx;
+	void MakeCube(double d);
+	void DrawPlainCube(YsGLSLShaded3DRenderer &renderer) const;
+	void DrawPlainCube(YsGLSLPlain3DRenderer &renderer) const;
+
+    Also wherever using it.
+
+
+() In Draw function
+	drawEnv.SetViewTarget((min+max)/2.0);
+	drawEnv.SetViewDistance((max-min).GetLength());
+
+  Delete:
+	modeling.Translate(cubePos);
+	modeling.RotateXZ(cubeAtt.h());
+	modeling.RotateZY(cubeAtt.p());
+	modeling.RotateXY(cubeAtt.b());
+
+  Replace:
+		DrawPlainCube(renderer);
+  with:
+		GLfloat color[4]={0,0,1,1};
+		renderer.SetUniformColor(color);
+		renderer.DrawVtxNom(GL_TRIANGLES,vtx.size()/3,vtx.data(),nom.data());
+
+
+  Replace:
+		DrawPlainCube(renderer);
+  with:
+		renderer.DrawVtx(GL_TRIANGLES,vtx.size()/3,vtx.data());
+
+
+
+() Add IsAsciiStl
+
+
+()
+/* virtual */ void FsLazyWindowApplication::BeforeEverything(int argc,char *argv[])
+{
+	if(2<=argc)
+	{
+		if(true==IsAsciiStl(argv[1]))
+		{
+			printf("It is not a binary stl!\n");
+			return;
+		}
+		LoadBinaryStl(argv[1]);
+	}
+}
+

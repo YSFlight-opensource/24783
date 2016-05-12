@@ -1,0 +1,13 @@
+From lighting
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_viewcontrol)
+
+
+() Add member variables prevMx,prevMy, initialize in constructor
+
+
+() Interval function
+
+

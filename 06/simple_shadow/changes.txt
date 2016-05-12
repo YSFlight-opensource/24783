@@ -1,0 +1,38 @@
+From modeling_transformation
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_simple_shadow)
+
+
+() Add member variable
+    std::vector <GLfloat> cubeVtx;
+
+
+() Add member function
+    void MakeCube(void)
+
+
+() Initialize function
+/* virtual */ void FsLazyWindowApplication::Initialize(int argc,char *argv[])
+{
+	YsGLSLRenderer::CreateSharedRenderer();
+	MakeCube(5.0);
+}
+
+
+
+() DrawPlainCube
+void FsLazyWindowApplication::DrawPlainCube(YsGLSLShaded3DRenderer &renderer) const
+{
+	renderer.DrawVtxNomCol(GL_TRIANGLES,36,cubeVtx.data(),cubeVtx.data()+108,cubeVtx.data()+216);
+}
+void FsLazyWindowApplication::DrawPlainCube(YsGLSLPlain3DRenderer &renderer) const
+{
+	renderer.DrawVtx(GL_TRIANGLES,36,cubeVtx.data());
+}
+
+
+
+() Draw function
+

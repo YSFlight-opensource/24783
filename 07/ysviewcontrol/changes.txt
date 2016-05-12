@@ -1,0 +1,106 @@
+From simple_shadow
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_ysviewcontrol)
+
+
+
+() Replace:
+    double h,p,b;
+    YsVec3 viewTarget;
+    double viewDist;
+
+   with
+    Ys3DDrawingEnvironment drawEnv;
+
+
+() Replace:
+    h=YsPi/4.0;
+    p=YsPi/5.0;
+    b=0;
+    viewTarget.Set(0.0,0.0,0.0);
+    viewDist=20.0;
+
+  with:
+    drawEnv.SetProjectionMode(YsProjectionTransformation::PERSPECTIVE);
+    drawEnv.SetViewTarget(YsVec3::Origin());
+    drawEnv.SetViewDistance(20.0);
+    drawEnv.SetViewAttitude(YsAtt3(YsPi/4.0,YsPi/5.0,0.0));
+
+
+
+() Replace:
+    if(0!=lb && (mx!=prevMx || my!=prevMy))
+    {
+        double denom=(double)YsGreater(wid,hei);
+        double dx=2.0*(double)(prevMx-mx)/denom;
+        double dy=2.0*(double)(prevMy-my)/denom;
+
+        YsVec3 fv(0,0,-1),uv(0,1,0);
+        fv.RotateXZ(-dx);
+        fv.RotateZY(-dy);
+        uv.RotateXZ(-dx);
+        uv.RotateZY(-dy);
+
+        YsMatrix3x3 view; // Camera to World
+        view.RotateXZ(h);
+        view.RotateZY(p);
+        view.RotateXY(b);
+        fv=view*fv;
+        uv=view*uv;
+
+        h=atan2(fv.x(),-fv.z());
+        p=asin(YsBound(-fv.y(),-1.0,1.0));
+        b=0.0; // Tentative
+
+        YsMatrix3x3 newView;
+        newView.RotateXZ(h);
+        newView.RotateZY(p);
+        newView.RotateXY(b); // In fact it's no rotation.
+        newView.MulInverse(uv,uv);
+        b=atan2(-uv.x(),uv.y());
+    }
+
+  with:
+    if(0!=lb && (mx!=prevMx || my!=prevMy))
+    {
+        double denom=(double)YsGreater(wid,hei);
+        double dx=2.0*(double)(prevMx-mx)/denom;
+        double dy=2.0*(double)(prevMy-my)/denom;
+        drawEnv.RotateView(dx,dy);
+    }
+
+
+
+() In Draw function, replace:
+    YsProjectionTransformation proj;
+    proj.SetProjectionMode(YsProjectionTransformation::PERSPECTIVE);
+    proj.SetAspectRatio((double)wid/(double)hei);
+    proj.SetFOVY(YsPi/4.0);
+    proj.SetNearFar(0.1,100.0);
+
+    GLfloat projMat[16];
+    proj.GetProjectionMatrix().GetOpenGlCompatibleMatrix(projMat);
+
+  with:
+    drawEnv.SetProjectionMode(YsProjectionTransformation::PERSPECTIVE);
+    drawEnv.SetAspectRatio((double)wid/(double)hei);
+    drawEnv.SetFOVY(YsPi/4.0);
+    drawEnv.SetNearFar(0.1,100.0);
+
+    GLfloat projMat[16];
+    drawEnv.GetProjectionMatrix().GetOpenGlCompatibleMatrix(projMat);
+
+
+  Replace:
+    YsMatrix4x4 view;
+    view.Translate(0,0,-viewDist);
+    view.RotateXY(-b);
+    view.RotateZY(-p);
+    view.RotateXZ(-h);
+    view.Translate(-viewTarget);
+
+  with:
+    auto &view=drawEnv.GetViewMatrix();
+

@@ -1,0 +1,38 @@
+From view_control
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_modeling_transformation)
+
+
+() Add member variables and initialize in constructor.
+	YsAtt3 cubeAtt;
+	YsVec3 cubePos;
+
+	cubeAtt.Set(0.0,0.0,0.0);
+	cubePos.Set(0.0,0.0,0.0);
+
+ // YsAtt3 : Attitude (h,p,b)
+
+
+
+() Modify in Draw function.
+	YsMatrix4x4 modeling;
+	modeling.Translate(cubePos);
+	modeling.RotateXZ(cubeAtt.h());
+	modeling.RotateZY(cubeAtt.p());
+	modeling.RotateXY(cubeAtt.b());
+
+	YsMatrix4x4 fullMatrix=view*modeling;
+
+	GLfloat viewMat[16];
+	fullMatrix.GetOpenGlCompatibleMatrix(viewMat);
+
+
+() Interval function
+
+	auto a=(double)FsSubSecondTimer()/1000.0;
+	cubePos.Set(2.0*cos(a),0.0,2.0*sin(a));
+	cubeAtt.SetH(a);
+
+

@@ -1,0 +1,182 @@
+From vbo
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_bounce3d)
+
+
+() Add sphereutil.h
+
+
+() Add
+
+    enum 
+    {
+        NUM_BALL=100
+    };
+    Ball ball[NUM_BALL];
+    int nBallVtx;
+
+
+() Remove
+    YsAtt3 cubeAtt;
+    YsVec3 cubePos;
+
+
+() Change
+    VertexBufferObjectVtxNomCol cubeVbo;  -> ballVbo;
+
+
+() MakeCube ->     void MakeBall(void);
+
+void FsLazyWindowApplication::MakeBall(void)
+{
+    auto sphereVtx=MakeSphere<GLfloat>(12);
+
+    ballVbo.CreateBuffer(2*sizeof(GLfloat)*sphereVtx.size());
+    auto currentPtr=ballVbo.GetZeroPointer();
+    ballVbo.vtxPtr=ballVbo.PushBufferSubData(currentPtr,sphereVtx.size(),sphereVtx.data());
+    ballVbo.nomPtr=ballVbo.PushBufferSubData(currentPtr,sphereVtx.size(),sphereVtx.data());
+    nBallVtx=sphereVtx.size()/3;
+}
+
+
+
+
+() DrawPlainCube -> DrawPlainBall
+
+void FsLazyWindowApplication::DrawPlainBall(YsGLSLShaded3DRenderer &renderer) const
+{
+    glBindBuffer(GL_ARRAY_BUFFER,ballVbo.GetVboIdent());
+    renderer.DrawVtxNom(GL_TRIANGLES,nBallVtx,(GLfloat *)ballVbo.vtxPtr,(GLfloat *)ballVbo.nomPtr);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+}
+void FsLazyWindowApplication::DrawPlainBall(YsGLSLPlain3DRenderer &renderer) const
+{
+    glBindBuffer(GL_ARRAY_BUFFER,ballVbo.GetVboIdent());
+    renderer.DrawVtx(GL_TRIANGLES,nBallVtx,(GLfloat *)ballVbo.vtxPtr);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+}
+
+
+
+() Interval
+Remove cube rotation.
+
+
+() View target (0,10,0)
+
+
+() SetInitialLocationAndVelocity function
+
+void FsLazyWindowApplication::SetInitialLocationAndVelocity(void)
+{
+    for(auto &b : ball)
+    {
+        int x=rand()%21-10;
+        int y=10+rand()%21-10;
+        int z=rand()%21-10
+
+        int vx=rand()%21-10;
+        int vy=rand()%21-10;
+        int vz=rand()%21-10
+
+        b.pos.Set(x,y,z);
+        b.vel.Set(vx,vy,vz);
+    }
+}
+
+
+() call it from the Initialize function
+
+
+() FsLazyWindowApplication::Move(const double dt);
+   Ball::Move(const double dt);
+    Ball::BounceOnWall(const YsVec3 &o,const YsVec3 &n)
+
+
+() In Interval
+    auto dt=(double)FsPassedTime()/1000.0;
+    Move(dt);
+    BallCollision();
+
+
+class Ball
+{
+public:
+    GLfloat col[4];
+    YsVec3 pos,vel;
+
+    void Move(const double dt)
+    {
+        const double G=9.8;
+        pos+=vel*dt;
+
+        YsVec3 a(0.0,-G,0.0);
+        vel+=a*dt;
+    }
+    void BounceOnWall(const YsVec3 &o,const YsVec3 &n)
+    {
+        const double radius=1.0;
+        const double dist=(pos-o)*n;
+        if(dist<radius && vel*n<0.0)
+        {
+            vel-=2.0*n*(vel*n);
+        }
+    }
+};
+
+void FsLazyWindowApplication::Move(const double dt)
+{
+    for(auto &b : ball)
+    {
+        b.Move(dt);
+        b.BounceOnWall(YsVec3(0.0,0.0,0.0),YsYVec());
+        b.BounceOnWall(YsVec3( 20.0,0.0,0.0),YsVec3(-1.0,0.0,0.0));
+        b.BounceOnWall(YsVec3(-20.0,0.0,0.0),YsVec3( 1.0,0.0,0.0));
+        b.BounceOnWall(YsVec3(0.0, 20.0,0.0),YsVec3(0.0,-1.0,0.0));
+        b.BounceOnWall(YsVec3(0.0,-20.0,0.0),YsVec3(0.0, 1.0,0.0));
+        b.BounceOnWall(YsVec3(0.0,0.0, 20.0),YsVec3(0.0,0.0,-1.0));
+        b.BounceOnWall(YsVec3(0.0,0.0,-20.0),YsVec3(0.0,0.0, 1.0));
+    }
+}
+
+
+() Draw all balls.
+
+    for(auto &b : ball)
+    {
+        YsMatrix4x4 translation;
+        translation.Translate(b.pos);
+
+        YsMatrix4x4 fullMatrix=view*translation;
+
+        GLfloat viewMat[16];
+        fullMatrix.GetOpenGlCompatibleMatrix(viewMat);
+
+        {
+            GLfloat lightDir[]={0,0,1};
+
+            YsGLSLShaded3DRenderer renderer;
+            renderer.SetProjection(projMat);
+            renderer.SetModelView(viewMat);
+            renderer.SetLightDirectionInCameraCoordinate(0,lightDir);
+            renderer.SetUniformColor(b.col);
+            DrawPlainBall(renderer);
+        }
+
+        YsMatrix4x4 shadowMat;
+        shadowMat.Scale(1.0,0.0,1.0);
+
+        fullMatrix=view*shadowMat*translation;
+        fullMatrix.GetOpenGlCompatibleMatrix(viewMat);
+        {
+            GLfloat color[]={0,0,0,1};
+
+            YsGLSLPlain3DRenderer renderer;
+            renderer.SetProjection(projMat);
+            renderer.SetModelView(viewMat);
+            renderer.SetUniformColor(color);
+            DrawPlainBall(renderer);
+        }
+    }

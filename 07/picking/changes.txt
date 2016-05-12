@@ -1,0 +1,140 @@
+From mouse_to_line
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_picking)
+
+
+
+() Make it a function
+void FsLazyWindowApplication::MouseCoordinateTo3DLine(YsVec3 ln[2],int mx,int my) const
+{
+    int wid,hei;
+    FsGetWindowSize(wid,hei);
+
+    double x=(double)mx/(double)wid;
+    double y=(double)(hei-my)/(double)hei;
+    x=x*2.0-1.0;
+    y=y*2.0-1.0;
+
+    ln[0].Set(x,y,-1.0);
+    ln[1].Set(x,y, 1.0);
+    for(int i=0; i<2; ++i)
+    {
+        auto &p=ln[i];
+        drawEnv.GetProjectionMatrix().MulInverse(p,p,1.0);
+        drawEnv.GetViewMatrix().MulInverse(p,p,1.0);
+    }
+}
+
+
+
+() Replace:
+    if(evt==FSMOUSEEVENT_LBUTTONDOWN)
+    {
+        double x=(double)mx/(double)wid;
+        double y=(double)(hei-my)/(double)hei;
+        x=x*2.0-1.0;
+        y=y*2.0-1.0;
+
+        lastClick[0].Set(x,y,-1.0);
+        lastClick[1].Set(x,y, 1.0);
+        for(auto &p : lastClick)
+        {
+            drawEnv.GetProjectionMatrix().MulInverse(p,p,1.0);
+            drawEnv.GetViewMatrix().MulInverse(p,p,1.0);
+        }
+    }
+  with:
+    if(evt==FSMOUSEEVENT_LBUTTONDOWN)
+    {
+        MouseCoordinateTo3DLine(lastClick,mx,my);
+    }
+
+
+
+() In FsLazyWindowApplication, add:
+   std::vector <float> col;
+
+
+() In LoadBinaryStl (non-static) function,
+  After calling static-version of LoadBinaryStl,
+
+    col.clear();
+    for(int i=0; i<vtx.size()/3; ++i)
+    {
+        col.push_back(0);
+        col.push_back(0);
+        col.push_back(1);
+        col.push_back(1);
+    }
+
+
+() In Draw function, replace:
+        GLfloat color[4]={0,0,1,1};
+        renderer.SetUniformColor(color);
+        renderer.DrawVtxNom(GL_TRIANGLES,vtx.size()/3,vtx.data(),nom.data());
+   with:
+        renderer.DrawVtxNomCol(GL_TRIANGLES,vtx.size()/3,vtx.data(),nom.data(),col.data());
+
+
+() Add:
+int FsLazyWindowApplication::PickedTriangle(int mx,int my) const
+{
+    YsVec3 ln[2];
+    MouseCoordinateTo3DLine(ln,mx,my);
+
+    const YsVec3 o=ln[0];
+    const YsVec3 v=YsUnitVector(ln[1]-ln[0]);
+
+    int picked=-1;
+    double pickedDist=0.0;
+    for(int i=0; i<vtx.size()/9; ++i)
+    {
+        const YsVec3 tri[3]=
+        {
+            YsVec3(vtx[i*9  ],vtx[i*9+1],vtx[i*9+2]),
+            YsVec3(vtx[i*9+3],vtx[i*9+4],vtx[i*9+5]),
+            YsVec3(vtx[i*9+6],vtx[i*9+7],vtx[i*9+8]),
+        };
+        YsPlane pln;
+        pln.MakePlaneFromTriangle(tri[0],tri[1],tri[2]);
+
+        YsVec3 itsc;
+        if(YSOK==pln.GetIntersection(itsc,o,v))
+        {
+            auto side=YsCheckInsideTriangle3(itsc,tri);
+            if(YSINSIDE==side || YSBOUNDARY==side)
+            {
+                auto dist=(itsc-o)*v; // Gives distance
+                if(0.0<dist && (picked<0 || dist<pickedDist))
+                {
+                    picked=i;
+                    pickedDist=dist;
+                }
+            }
+        }
+    }
+
+    return picked;
+}
+
+
+
+() Modify:
+    if(evt==FSMOUSEEVENT_LBUTTONDOWN)
+    {
+        MouseCoordinateTo3DLine(lastClick,mx,my);
+
+        int triIdx=PickedTriangle(mx,my);
+        if(0<=triIdx)
+        {
+            for(int i=0; i<3; ++i)
+            {
+                col[((3*triIdx)+i)*4  ]=1;
+                col[((3*triIdx)+i)*4+1]=0;
+                col[((3*triIdx)+i)*4+2]=0;
+            }
+        }
+    }
+
