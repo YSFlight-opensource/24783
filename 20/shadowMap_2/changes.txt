@@ -1,0 +1,24 @@
+from shadowMap_1
+
+1  Add lightDir member variable.
+   In Initialize()
+	lightDir=YsVec3(0,1,1);
+	lightDir.Normalize();
+
+   Also lightViewTfm, lightProjTfm
+
+2. In Draw
+	YsVec3 lightDir;
+	drawEnv.GetViewMatrix().Mul(lightDir,this->lightDir,0.0);
+	glUniform3f(phong3d.uniformLightDirPos,lightDir.xf(),lightDir.yf(),lightDir.zf());
+
+
+3. Write RenderShadowBuffer
+
+
+4. Write VerifyShadowMap
+
+
+5. Call RenderShadowBuffer and VerifyShadowMap from Draw
+
+

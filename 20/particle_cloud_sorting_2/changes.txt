@@ -1,0 +1,6 @@
+from particle_cloud_sorting
+
+1. Modify particle.MakeVertexBuffer function.
+   Add SortIndex function.  Also #include <ysmergesort.h>
+
+2. MakeVertexBuffer moved to Draw function.  Add view direction as parameter;

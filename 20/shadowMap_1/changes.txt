@@ -1,0 +1,17 @@
+from phong
+
+1 Add shadowmap_verify_???shader.glsl
+
+2. 	DepthVerifyRenderer depthVerify;
+   Also load shaders in Initialize.
+
+3.  shadow_map_buffer.h and shadow_map_buffer.cpp
+   Include shadow_map_buffer.h from main.cpp
+
+4. Add
+    OpenGLShadowMapBuffer shadowMapBuffer;
+   and call
+    shadowMapBuffer.PrepareBuffer(1024,1024);
+
+5. Run and check if the buffer is created with no error.
+
