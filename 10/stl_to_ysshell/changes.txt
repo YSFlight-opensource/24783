@@ -1,0 +1,48 @@
+From mouse_to_line
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_picking)
+
+
+
+() Member functions:
+	static void VtxNomToYsShell(YsShellExt &shl,const std::vector <float> &vtx,const std::vector <float> &nom);
+	static void YsShellToVtxNom(std::vector <float> &vtx,std::vector <float> &nom,const YsShellExt &shl);
+
+
+
+() Member Variable:
+	YsShellExt shl;
+
+
+
+() Modify CacheBoundingBox
+
+
+
+() Modify PickedTriangle function
+
+
+
+() Modify PickedPoint to PickedVertex
+
+
+
+() Modify FSMOUSEEVENT_LBUTTONDOWN handling
+
+
+
+() Remove handler for FSMOUSEEVENT_RBUTTONDOWN
+
+
+
+----O(N^2) method
+
+
+() Copy and #include lattice.h
+
+
+() Add 
+	static void GetBoundingBox
+	static void PrepareLatticeForConnection

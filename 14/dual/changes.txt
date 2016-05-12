@@ -1,0 +1,92 @@
+From stl_to_ysshell
+
+() CMakeLists.txt
+
+set(TARGET_NAME mesh_dual)
+
+
+
+() Add member variables:
+    enum STATE
+    {
+        STATE_NORMAL,
+        STATE_DUAL
+    };
+
+    STATE state;
+
+    std::vector <float> dualVtx;
+
+
+() In the constructor
+    state=STATE_NORMAL;
+
+
+
+() In LoadBinaryStl
+
+    shl.EnableSearch();
+
+
+() Add MakeDual function
+
+void FsLazyWindowApplication::MakeDual(void)
+{
+    dualVtx.clear();
+    for(auto plHd : shl.AllPolygon())
+    {
+        auto cen=shl.GetCenter(plHd);
+        auto nEdge=shl.GetPolygonNumVertex(plHd);
+        for(decltype(nEdge) edIdx=0; edIdx<nEdge; ++edIdx)
+        {
+            auto neiPlHd=shl.GetNeighborPolygon(plHd,edIdx);
+            if(nullptr!=neiPlHd && shl.GetSearchKey(plHd)<shl.GetSearchKey(neiPlHd))
+            {
+                auto neiCen=shl.GetCenter(neiPlHd);
+                dualVtx.push_back(cen.xf());
+                dualVtx.push_back(cen.yf());
+                dualVtx.push_back(cen.zf());
+                dualVtx.push_back(neiCen.xf());
+                dualVtx.push_back(neiCen.yf());
+                dualVtx.push_back(neiCen.zf());
+            }
+        }
+    }
+}
+
+
+
+() In Interval
+    if(FSKEY_D==key)
+    {
+        MakeDual();
+        state=STATE_DUAL;
+    }
+    if(FSKEY_N==key)
+    {
+        state=STATE_NORMAL;
+    }
+
+() In Draw
+
+    if(STATE_NORMAL==state)
+    {
+        GLfloat lightDir[]={0,0,1};
+
+        YsGLSLShaded3DRenderer renderer;
+        renderer.SetProjection(projMat);
+        renderer.SetModelView(viewMat);
+        renderer.SetLightDirectionInCameraCoordinate(0,lightDir);
+
+        renderer.DrawVtxNomCol(GL_TRIANGLES,vtx.size()/3,vtx.data(),nom.data(),col.data());
+    }
+    else if(STATE_DUAL==state)
+    {
+        YsGLSLPlain3DRenderer renderer;
+        renderer.SetProjection(projMat);
+        renderer.SetModelView(viewMat);
+
+        GLfloat color[4]={0,0,0,1};
+        renderer.SetUniformColor(color);
+        renderer.DrawVtx(GL_LINES,dualVtx.size()/3,dualVtx.data());
+    }

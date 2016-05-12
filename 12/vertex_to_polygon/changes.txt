@@ -1,0 +1,10 @@
+From mouse_to_line
+
+() CMakeLists.txt
+
+set(TARGET_NAME mesh_vertex_to_polygon)
+
+
+set(LIB_DEPENDENCY fslazywindow geblkernel ysclass ysgl ysglcpp ysglcpp_gl2)
+
+

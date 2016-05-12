@@ -1,0 +1,68 @@
+From stl_to_ysshell
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_lattice_line)
+
+
+
+() lattice.h
+#include <math.h>
+bool ClipLine(YsVec3 &p1,YsVec3 &p2,const YsVec3 o,const YsVec3 n) const;
+
+
+
+() Make Lattice a member variable (move from VtxNomToYsShell)
+   Make VtxNomToYsShell a non-static function (because it populates a lattice)
+
+
+
+() In FSMOUSEEVENT_LBUTTONDOWN handling, (Remove lifting)
+
+    if(evt==FSMOUSEEVENT_LBUTTONDOWN)
+    {
+        drawEnv.SetWindowSize(wid,hei);
+        drawEnv.SetViewportByTwoCorner(0,0,wid,hei);
+        drawEnv.TransformScreenCoordTo3DLine(lastClick[0],lastClick[1],mx,my);
+        lastClick[1]*=80.0;
+        lastClick[1]+=lastClick[0];
+
+        if(true!=ltc.ClipLine(lastClick[0],lastClick[1],lastClick[0],lastClick[1]-lastClick[0]))
+        {
+            printf("No intersection.\n");
+        }
+    }
+
+
+() Change polygon color to 0,0,0,0.5f,
+   Draw line first.
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+
+
+---- Test clipping
+
+
+() In lattice.h
+#include <vector>
+
+() In Lattice3d, add
+void Lattice3d<T>::GetBlockRange(YsVec3 &min,YsVec3 &max,YsVec3i idx) const
+std::vector <YsVec3i> GetIntersectingBlock(const YsVec3 o,const YsVec3 n) const;
+
+
+() LBUTTONDOWN
+		cellVtx.clear();
+		auto itscIdx=ltc.GetIntersectingBlock(lastClick[0],lastClick[1]-lastClick[0]);
+		for(auto i : itscIdx)
+		{
+			YsVec3 min,max;
+			ltc.GetBlockRange(min,max,i);
+			auto cen=(min+max)/2.0;
+			cellVtx.push_back(cen.xf());
+			cellVtx.push_back(cen.yf());
+			cellVtx.push_back(cen.zf());
+		}
+

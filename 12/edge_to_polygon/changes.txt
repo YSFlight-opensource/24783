@@ -1,0 +1,11 @@
+From stl_to_ysshell
+
+() CMakeLists.txt
+
+set(TARGET_NAME glsl3d_picking)
+
+
+
+
+() vtxnomtoysshell -> vtxnomcoltoysshell
+
