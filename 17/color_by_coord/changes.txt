@@ -1,0 +1,33 @@
+from glsl_compile
+
+() Add
+varying vec4 projected_vertex;
+in both two shader sources.
+
+varying in vertex and fragment shaders must match.  (Varying used in the fragment shader must exist in the vertex shader.)
+
+// gl_FragCoord is supposed to be available, but depends on what GLSL version is used.
+
+
+
+() In vertex shader,
+	projected_vertex=vec4(vertex,1.0);
+
+
+() In fragment shader,
+varying vec4 projected_vertex;
+
+void main()
+{
+	gl_FragColor=projected_vertex;
+	gl_FragColor+=vec4(1.0,1.0,1.0,0.0);
+	gl_FragColor.x/=2.0;
+	gl_FragColor.y/=2.0;
+	gl_FragColor.z/=2.0;
+	gl_FragColor.w=1.0;
+}
+
+
+
+// Be careful about the copy-file.  Just modifying shader sources won't automatically re-compile and re-copy.
+// Must touch a source file.

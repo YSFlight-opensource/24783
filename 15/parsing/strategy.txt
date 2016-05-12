@@ -1,0 +1,14 @@
+Want to make everything as a group of:
+ - One term, or
+ - Two terms connected by one operator.
+
+
+
+Essentially we decompose it to a binary tree, but we don't call it left and right.
+
+
+prev
+  |
+node -> sub
+  |
+next
