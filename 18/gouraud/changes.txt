@@ -1,0 +1,18 @@
+from rainbow3d
+
+() svn-copy plain3d_fragment_shader.glsl, gouraud_vertex_shader.glsl -> gouraud_fragment_shader.glsl, rainbow3d_vertex_shader.glsl
+
+() Vertex shader
+attribute vec3 normal;
+uniform vec3 lightDir;
+uniform float ambient;
+uniform float specularExponent;
+
+() Write shaders.
+
+() Add 
+    class Gouraud3dRenderer : public RendererBase
+
+() Add member variable
+	Gouraud3dRenderer gouraud3d;
+
