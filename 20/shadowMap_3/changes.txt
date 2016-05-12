@@ -1,0 +1,34 @@
+from shadowMap_2
+
+1. Modify phong3d_vertex_shader.glsl, phong3d_fragment_shader.glsl
+
+(vertex shader)
+varying shadowCoord;
+uniform mat4 shadowMapTfm;
+	shadowMapCoord=shadowMapTfm*modelView*vertex;
+
+(fragment shader)
+uniform sampler2D shadowMapTexture;
+
+Add RainbowColor function
+
+
+
+2.
+class Phong3dRenderer : public Gouraud3dRenderer
+{
+public:
+	GLuint uniformShadowMapTexturePos;
+	GLuint uniformShadowMapTfmPos;
+
+	virtual void CacheAttributeAndUniformIdent(void);
+};
+
+
+void Phong3dRenderer::CacheAttributeAndUniformIdent(void)
+{
+	Gouraud3dRenderer::CacheAttributeAndUniformIdent();
+
+	uniformShadowMapTexturePos=glGetUniformLocation(programIdent,"shadowMapTexturePos");
+	uniformShadowMapTfmPos=glGetUniformLocation(programIdent,"shadowMapTfmPos");
+}

@@ -1,0 +1,12 @@
+from phong
+
+() Remove STL-related variables and functions.
+
+2.
+	drawEnv.SetViewTarget(YsVec3::Origin());
+	drawEnv.SetViewDistance(20.0);
+
+3. DrawCube
+
+4. Blend
+
