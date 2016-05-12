@@ -1,0 +1,7 @@
+From 8_quadricErrorMetric
+
+1. Add hashtable.h, priorityqueue.h, and bintree.h
+
+
+2. QEMSimplifier class
+

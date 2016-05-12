@@ -1,0 +1,18 @@
+From PS1_Solution
+
+
+1. Keep track of the node count.
+      int nNode;
+
+   nNode=0 in Constructor
+   nNode=0 in CleanUp
+
+   ++nNode in Add
+   --nNode in Delete
+
+
+2. In Add, count the depth.
+
+3. In Add, if depth exceeds the minimum depth*2, rebalance.
+
+4. In main, add a number in a sequence instead of random, and check the tree is re-balanced.

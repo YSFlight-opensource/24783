@@ -1,0 +1,18 @@
+From 6_view_options
+
+1. Add:
+class MoveDialog : public FsGuiDialog
+
+void FsGui3DMainCanvas::Edit_Move_Dialog(FsGuiPopUpMenuItem *)
+{
+	auto dlg=FsGuiDialog::CreateSelfDestructiveDialog<MoveDialog>();
+	dlg->Make(this);
+	AddDialog(dlg);
+}
+
+
+2. Implement OnButtonClick
+
+
+3. Add menu
+

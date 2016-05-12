@@ -1,0 +1,61 @@
+From 6_edgeCollapse
+
+1. Add a metric calculator
+
+double CalculateQuadricErrorMetric(
+   const YsShellExt &shl,
+   YsShell::VertexHandle fromVtHd,
+   YsShell::VertexHandle toVtHd)
+{
+	double sum=0.0;
+	auto plHdToDel=shl.FindPolygonFromEdgePiece(fromVtHd,toVtHd);
+	auto fromPos=shl.GetVertexPosition(fromVtHd);
+	auto toPos=shl.GetVertexPosition(toVtHd);
+	for(auto plHd : shl.FindPolygonFromVertex(fromVtHd))
+	{
+		auto nom=YsShell_CalculateNormal(shl.Conv(),plHd);
+		auto d=(toPos-fromPos)*nom;
+		sum+=d*d;
+	}
+	return sum;
+}
+
+
+
+2. Add a menu for collapse minimum-cost edge.
+void FsGui3DMainCanvas::Edit_CollapseMinimumCostEdge(FsGuiPopUpMenuItem *)
+{
+	double minMetric=YsInfinity;
+	YsShell::VertexHandle minEdVtHd[2]={nullptr,nullptr};
+	for(auto vtHd : shl.AllVertex())
+	{
+		for(auto connVtHd : shl.GetConnectedVertex(vtHd))
+		{
+			auto cost=CalculateQuadricErrorMetric(shl,vtHd,connVtHd);
+			if(cost<minMetric || nullptr==minEdVtHd[0])
+			{
+				minMetric=cost;
+				minEdVtHd[0]=vtHd;
+				minEdVtHd[1]=connVtHd;
+			}
+		}
+	}
+
+	if(nullptr!=minEdVtHd[0])
+	{
+		YsShell_CollapseInfo info;
+		if(YSOK==info.Make(shl,minEdVtHd))
+		{
+			info.Apply(shl,YSFALSE);
+		}
+	}
+
+	YsShellToVtxNom(vtx,nom,col,shl);
+	SetNeedRedraw(YSTRUE);
+}
+
+
+3. Let's add a short cut.
+
+
+
