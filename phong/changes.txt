@@ -1,0 +1,22 @@
+from gouraud
+
+() svn-copy gouraud_fragment_shader.glsl, rainbow3d_vertex_shader.glsl -> phong_fragment_shader.glsl and phong_vertex_shader.glsl
+
+() Vertex shader
+varying normalOut;
+varying viewDirOut;
+
+() Fragment shader add color calculation
+
+() Write shaders.
+
+() Add 
+class Phong3dRenderer : public Gouraud3dRenderer
+{
+};
+   In fact, it is same as Gouraud3dRenderer.
+
+
+() Add member variable
+	Phong3dRenderer phong3d;
+

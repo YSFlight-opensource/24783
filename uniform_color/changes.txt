@@ -1,0 +1,73 @@
+from glsl_compile
+
+() Add in renderer.h
+class UniformColorRenderer : public RendererBase
+{
+public:
+    GLuint attribVertexPos;
+    GLuint uniformColorPos;
+    virtual void CacheAttributeAndUniformIdent(void);
+};
+
+
+() Add in renderer.cpp
+/* virtual */ void UniformColorRenderer::CacheAttributeAndUniformIdent(void)
+{
+    attribVertexPos=glGetAttribLocation(programIdent,"vertex");
+    printf("Attribute Vertex Position=%d\n",attribVertexPos);
+    uniformColorPos=glGetUniformLocation(programIdent,"color");
+    printf("Uniform Color Position=%d\n",uniformColorPos);
+}
+
+
+() SVN-Copy fragment_shader.glsl and vertex_shader.glsl to
+    uniform_color_fragment_shader.glsl and
+    uniform_color_vertex_shader.glsl
+
+No change in the vertex chader.
+
+uniform vec4 color;
+void main()
+{
+    gl_FragColor=color;
+}
+
+
+
+() Add
+    UniformColorRenderer uniformColor;
+
+
+
+() In Initialize
+    uniformColor.CompileFile(
+        "uniform_color_vertex_shader.glsl",
+        "uniform_color_fragment_shader.glsl");
+
+
+
+() In Draw
+void FsLazyWindowApplication::Draw(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(uniformColor.programIdent);
+    const GLfloat vtx[12]=
+    {
+        -1,-1,0,
+         1,-1,0,
+         1, 1,0,
+        -1, 1,0
+    };
+    const GLfloat col[4]={0,1,0,1};
+    glUniform4fv(uniformColor.uniformColorPos,1,col);
+    glEnableVertexAttribArray(uniformColor.attribVertexPos);
+    glVertexAttribPointer(uniformColor.attribVertexPos,3,GL_FLOAT,GL_FALSE,0,vtx);
+    glDrawArrays(GL_TRIANGLE_FAN,0,4);
+    glDisableVertexAttribArray(uniformColor.attribVertexPos);
+
+    FsSwapBuffers();
+
+    needRedraw=false;
+}
+
