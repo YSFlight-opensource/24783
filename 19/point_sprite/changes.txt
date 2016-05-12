@@ -1,0 +1,5 @@
+from program_point_size_in_3d
+
+1. Svn-copy program_point_size_vertex_shader.glsl and program_point_size_fragment_shader.glsl to
+    pointssprite_vertex_shader.glsl and pointsprite_fragment_shader.glsl
+

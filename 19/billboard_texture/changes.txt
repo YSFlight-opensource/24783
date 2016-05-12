@@ -1,0 +1,12 @@
+from billboard
+
+1. Copy BlueImpulse.png
+
+2. Add member variable 
+    GLuint textureIdent;
+
+4. Add YsBitmap in the LIB_DEPENDENCY, and add #include <ysbitmap.h>
+
+3. In Initialize() function, load texture.
+
+6. Change color 0,0,0,1 to 1,1,1,1.
