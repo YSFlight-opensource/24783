@@ -1,0 +1,9 @@
+from billboard_texture
+
+1. Svn-copy plain3d_vertex_shader.glsl and plain3d_fragment_shader.glsl to program_point_size_vertex_shader.glsl and program_point_size_fragment_shader.glsl
+
+2. Modify shaders.
+
+3. Add ProgramPointSize3dRenderer
+
+4. Add member variable, and Initialize 
