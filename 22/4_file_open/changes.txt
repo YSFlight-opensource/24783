@@ -1,0 +1,59 @@
+1. svn export /development/public/src/fsgui3d/template 1_file_open
+
+
+Add file dialog (file-dialog is platform-specific)
+Adding menu call-back
+2. Add in FsGui3dMainCanvas
+	void File_Open(FsGuiPopUpMenuItem *);
+
+
+3. Add filemenu.cpp, and add File_Open skeleton (just print a message)
+
+4. In FsGui3dMainCanvas::MakeMainMenu,
+	fileSubMenu->AddTextItem(0,FSKEY_O,L"Open")->BindCallBack(&THISCLASS::File_Open,this);
+
+5. Compile and see it is called.
+
+
+
+6. Add fsguifiledialog in LIB_DEPENDENCY (re-run cmake)
+
+7. #include <fsguifiledialog.h>
+
+8. Now, I want to define what should happen when the dialog is closed.
+   Add in definition:
+	void File_Open_OnCloseDialog(FsGuiDialog *dlg,int returnCode);
+
+9. 
+	fdlg->BindCloseModalCallBack(&THISCLASS::File_Open_OnCloseDialog,this);
+
+10.  Add a message in OnCloseDialog and check the function is called when the fdlg is closed.
+
+11.  Print file name to see the selected file is retrievable.
+
+
+
+12  Add library dependencies
+    ysport geblkernel ysglcpp ysglcpp_gl2 
+
+13  Copy data structures from phong-shading example
+	YsShellExt shl;
+	std::vector <float> vtx,nom;
+	std::vector <float> col;
+
+    also utility functions
+	void LoadModel(const char fn[]);
+	static void YsShellToVtxNom(std::vector <float> &vtx,std::vector <float> &nom,std::vector <float> &col,const YsShellExt &shl);
+
+    (Don't need CacheBoundingBox)
+
+
+14  In File_Open_OnCloseDialog,
+    LoadModel
+    YsShellToVtxNom
+
+15  
+#include <ysglcpp.h>
+#include <ysglslcpp.h>
+
+Render it using YsGLSLShaded3DRenderer

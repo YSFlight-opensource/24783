@@ -1,0 +1,84 @@
+From 5_select_vertex
+
+1. Add:
+	std::vector <float> wireVtx;
+
+
+2. Change YsShellToVtxNom to (non-static) RemakeVertexAttributeArray(void);
+   Also populate wireVtx.
+
+			for(int i=0; i<plVtHd.GetN(); ++i)
+			{
+				YsVec3 vtPos[2]=
+				{
+					shl.GetVertexPosition(plVtHd[i]),
+					shl.GetVertexPosition(plVtHd.GetCyclic(i+1))
+				};
+				wireVtx.push_back(vtPos[0].xf());
+				wireVtx.push_back(vtPos[0].yf());
+				wireVtx.push_back(vtPos[0].zf());
+				wireVtx.push_back(vtPos[1].xf());
+				wireVtx.push_back(vtPos[1].yf());
+				wireVtx.push_back(vtPos[1].zf());
+			}
+
+
+3. Add
+	FsGuiPopUpMenuItem *wireframe;
+	FsGuiPopUpMenuItem *lighting;
+
+
+4. Modify MakeMainMenu
+	wireframe=viewSubMenu->AddTextItem(0,FSKEY_NULL,L"Draw Wireframe");
+	wireframe->SetCheck(YSTRUE);
+	wireframe->BindCallBack(&THISCLASS::FlipMenuCheck,this);
+	lighting=viewSubMenu->AddTextItem(0,FSKEY_NULL,L"Lighting");
+	lighting->BindCallBack(&THISCLASS::FlipMenuCheck,this);
+	lighting->SetCheck(YSTRUE);
+
+
+5. Add FlipMenuCheck function
+
+void FsGui3DMainCanvas::FlipMenuCheck(FsGuiPopUpMenuItem *menu)
+{
+	auto check=menu->GetCheck();
+	YsFlip(check);
+	menu->SetCheck(check);
+	SetNeedRedraw(YSTRUE);
+}
+
+
+
+6. Draw function:
+	if(YSTRUE==lighting->GetCheck())
+	{
+		YsGLSLShaded3DRenderer renderer;
+
+		GLfloat lightDir[3]={0,0,1};
+		renderer.SetLightDirectionInCameraCoordinate(0,lightDir);
+		renderer.DrawVtxNomCol(GL_TRIANGLES,vtx.size()/3,vtx.data(),nom.data(),col.data());
+	}
+	else
+	{
+		YsGLSLPlain3DRenderer renderer;
+		renderer.DrawVtxCol(GL_TRIANGLES,vtx.size()/3,vtx.data(),col.data());
+	}
+
+	{
+		YsGLSLPlain3DRenderer renderer;
+		renderer.SetUniformPointSize(8.0f);
+		glEnable(GL_PROGRAM_POINT_SIZE);
+		GLfloat magenta[]={1,0,1,1};
+		renderer.SetZOffset(-0.0001);
+		renderer.SetUniformColor(magenta);
+		renderer.DrawVtx(GL_POINTS,selVtxBuffer.size()/3,selVtxBuffer.data());
+		glDisable(GL_PROGRAM_POINT_SIZE);
+
+	   	if(YSTRUE==wireframe->GetCheck())
+		{
+			GLfloat black[]={0,0,0,1};
+			renderer.SetUniformColor(black);
+			renderer.DrawVtx(GL_LINES,wireVtx.size()/3,wireVtx.data());
+		}
+		renderer.SetZOffset(0);
+	}

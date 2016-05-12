@@ -1,0 +1,31 @@
+1. svn export /development/public/src/fsgui3d/template 1_file_open
+
+
+2. Add 
+   GLfloat bgColor[4];
+
+
+3.  In constructor
+	bgColor[0]=1;
+	bgColor[1]=1;
+	bgColor[2]=1;
+	bgColor[3]=1;
+
+
+4.  In Draw
+	glClearColor(bgColor[0],bgColor[1],bgColor[2],bgColor[3]);
+
+
+5. Add:
+   void View_SetRedBackground(FsGuiPopUpMenuItem *);
+   void View_SetBlueBackground(FsGuiPopUpMenuItem *);
+   void View_SetGreenBackground(FsGuiPopUpMenuItem *);
+   void View_SetWhiteBackground(FsGuiPopUpMenuItem *);
+
+6. In MakeMainMenu
+	auto viewSubMenu=mainMenu->AddTextItem(0,FSKEY_V,L"View")->GetSubMenu();
+	viewSubMenu->AddTextItem(0,FSKEY_NULL,L"Red Background")->BindCallBack(&THISCLASS::View_SetRedBackground,this);
+	viewSubMenu->AddTextItem(0,FSKEY_NULL,L"Green Background")->BindCallBack(&THISCLASS::View_SetGreenBackground,this);
+	viewSubMenu->AddTextItem(0,FSKEY_NULL,L"Blue Background")->BindCallBack(&THISCLASS::View_SetBlueBackground,this);
+	viewSubMenu->AddTextItem(0,FSKEY_NULL,L"White Background")->BindCallBack(&THISCLASS::View_SetWhiteBackground,this);
+

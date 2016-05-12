@@ -1,0 +1,25 @@
+From file_open
+
+1. Copy PickedVertex from greedy_path_finding
+
+2. Add
+	std::vector <YsShell::VertexHandle> selectedVertex;
+	std::vector <float> selVtxBuf;
+
+	void RemakeSelectedVertexBuffer(void);
+
+3. Add
+void FsGui3DMainCanvas::Select_UnselectAll(FsGuiPopUpMenuItem *)
+{
+}
+void FsGui3DMainCanvas::Select_Vertex(FsGuiPopUpMenuItem *)
+{
+}
+void FsGui3DMainCanvas::Select_Vertex_LButtonDown(FsGuiMouseButtonSet,YsVec2i))
+{
+}
+
+4. Add select menu.
+
+
+5. Draw selected vertices.
