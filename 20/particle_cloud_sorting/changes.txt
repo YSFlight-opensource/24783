@@ -1,0 +1,23 @@
+from point_sprite_with_texture
+
+1. Add particle.cpp , particle.h
+
+2. Delete vertex buffers for billboard and point-sprites
+
+3. Add member variable
+	int nParticle;
+    ParticleGroup particleGroup;
+
+4. In Initialize
+	nParticle=1000;
+	particleGroup.MakeCloud(nParticle,YsVec3(-8,-4,-8),YsVec3(8,4,8));
+	particleGroup.MakeVertexBuffer();
+
+5. Delete drawing of wireframe cube
+
+   glClearColor(0.2,0.2,0.7,0.0);
+
+6. Modify particle drawing so that it uses the vertex attribute buffers in the particle data structure.
+
+But, something is strange.
+

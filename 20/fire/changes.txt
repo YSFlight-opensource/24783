@@ -1,0 +1,14 @@
+from particle_cloud_sorting_2
+
+1. Add member variables in ParticleGroup::Particle
+		YsVec3 vel;
+		double t;
+
+2. void AddFireParticle(void);
+
+3. void Move(double dt);
+
+4. Delete MakeCloud
+
+5. Add code for incrementally adding particles, and moving particles.
+
